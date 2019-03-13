@@ -93,7 +93,7 @@ Commme les clients envoient en continue des trames PROBE(request/answer) (ces tr
 
 __Question__ : pourquoi le suivi n'est-il plus possible sur iPhone depuis iOS 8 ?
 
-Ce n'est plus possible car depuis IOS 8 l'adresse MAC des iPhone change aléatoirement
+Ce n'est plus possible car depuis IOS 8 l'adresse MAC des iPhone change aléatoirement. Ce n'est plus possible que si l'iPhone n'est pas encore connecté à un réseau (sinon son adresse ne change plus et il continue à envoyé les requêtes PROBE (pour pouvoir se déplacer sans perdre le réseau, pour en detecter d'autre))
 
 
 ### 2. Clients WiFi bavards
