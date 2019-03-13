@@ -89,7 +89,11 @@ __ATTENTION__ : Le suivi de clients iPhone n'est plus possible que dans certaine
 
 __Question__ : quel type de trames sont nécessaires pour détecter les clients de manière passive ?
 
+Commme les clients envoient en continue des trames PROBE(request/answer), on a qu'à juste écouter ces trames sans que le clients puisse le savoir => trames PROBE
+
 __Question__ : pourquoi le suivi n'est-il plus possible sur iPhone depuis iOS 8 ?
+
+Ce n'est plus possible car depuis IOS 8 l'adresse MAC des iPhone change aléatoirement
 
 
 ### 2. Clients WiFi bavards
