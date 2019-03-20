@@ -15,8 +15,8 @@ INTERFACE_WIFI = "en0"
 #Adresse de l'API qui résout les mac address en nom de fabricant
 API_MAC_URL = "https://api.macvendors.com/"
 
-# Récupération de l'adresse MAC passée en paramètre
-networksAddress = []
+macAddresses = {}
+macSsids = {}
 
 def macToVendor(mac):
     curUrl = API_MAC_URL + mac.upper().replace(":","-") #Formattage de l'adresse de l'API pour requête
@@ -25,27 +25,40 @@ def macToVendor(mac):
     vendor = "Fabricant inconnu"
 
     # Vérifier si un nom de fabriquant a été retourné (si la page existe)
-    if(req.status_code == 200):
+    if(req.status_code != 404):
         vendor = req.text
 
     return vendor
 
 ##############################################################################
-## Affiche un message de confirmation, si le paquet récupéré est un probe
-## request provenant de l'adresse MAC spécifiée
+## Recupère les informations du paquet récupéré
 ## In: packet - paquet qui a été récupéré
 ##############################################################################
-def detectNetork(packet):
-    # Vérifie si le paquet est un beacon
-    if packet.type == 0 and packet.subtype == 8:
-        # Vérifie si l'adresse du réseau est déjà enregistrée
-        if(packet.addr2 not in networksAddress):
-            networksAddress.append(packet.addr2)
-            print(packet.addr2 + " (" + macToVendor(packet.addr2) + ") - " + packet.info)
+def detectProbeRequest(packet):
+        # Vérifie si le paquet contient les informations nécessaire à lister les dispositifs et leurs probe request ssid
+        if (hasattr(packet, 'type') and packet.type == 0 and packet.subtype == 4 and hasattr(packet, 'info') and packet.info):
+            # Vérifie si l'adresse MAC du dispositif n'est pas encore enregistrée
+            if(packet.addr2 not in macAddresses):
+                macAddresses[packet.addr2] = macToVendor(packet.addr2)
 
+            if(packet.addr2 not in macSsids):
+                macSsids[packet.addr2] = []
+            if (packet.info not in macSsids[packet.addr2]):
+                macSsids[packet.addr2].append(packet.info)
+            printCliensInfos()
+
+
+def printCliensInfos():
+    print(chr(27) + "[2J")
+    for mac in macAddresses:
+        print(mac + " (" + macAddresses[mac] + ") - " + "".join([str(" [" + x + "]").encode("utf-8") for x in macSsids[mac]]))
+
+def printNetworks(mac):
+    for ssid in macSsids[mac]:
+        print(str(ssid).decode("utf-8") + ", ")
 
 
 # On sniff le reseau avec l interface wlan0mon et on applique la fonction detectMac pour chaque paquet
-pckt = scapy.sniff(iface=INTERFACE_WIFI, monitor="true", prn=detectNetork) # Ajouter l'argument "monitor=true" dans le cas de l'utilisation d'un Mac
+pckt = scapy.sniff(iface=INTERFACE_WIFI, monitor="true", prn=detectProbeRequest) # Ajouter l'argument "monitor=true" dans le cas de l'utilisation d'un Mac
 
 
