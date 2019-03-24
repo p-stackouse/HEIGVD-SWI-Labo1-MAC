@@ -11,7 +11,7 @@ import scapy.all as scapy
 import sys #pour pouvoir recuperer l argument
 
 #Nom de l'interface réseau utilisée pour monitorer
-INTERFACE_WIFI = "en0"
+INTERFACE_WIFI = "wlan0mon"
 
 # Vérifier que le nombre d'arguments est correct
 if(len(sys.argv) != 2):
